@@ -53,6 +53,15 @@ st.markdown("""
 [data-testid="stDecoration"], #MainMenu, footer,
 .stDeployButton, [data-testid="stAppViewToolbar"] { display: none !important; }
 
+/* ── Clean file uploader: hide drag-drop text ── */
+[data-testid="stFileUploader"] section > div:first-child > span,
+[data-testid="stFileUploader"] small,
+[data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] p { display: none !important; }
+[data-testid="stFileUploader"] button { margin-top: 0 !important; }
+[data-testid="stToolbar"], header[data-testid="stHeader"],
+[data-testid="stDecoration"], #MainMenu, footer,
+.stDeployButton, [data-testid="stAppViewToolbar"] { display: none !important; }
+
 /* ── Global ── */
 * { font-family: 'Noto Sans SC',system-ui,sans-serif !important; }
 .stApp { background: var(--bg) !important; }
@@ -287,10 +296,10 @@ if st.session_state.page=="home":
     # Upload area on home page
     st.divider()
     um = st.file_uploader(
-        "",
+        "📤",
         type=["pdf","docx","doc","txt"],
         accept_multiple_files=True,
-        label_visibility="collapsed",
+        label_visibility="visible",
         key="home_up"
     )
     if um:
