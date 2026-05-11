@@ -229,7 +229,7 @@ if not st.session_state.logged_in:
         username = st.text_input("用户名", placeholder="输入用户名", key="login_user")
         password = st.text_input("密码", type="password", placeholder="输入密码", key="login_pw")
 
-        c1, c2 = st.columns([2, 1])
+        c1, _ = st.columns([2, 1])
         with c1:
             if st.button("登录" if is_login else "注册", type="primary", use_container_width=True):
                 if not username or not password:
@@ -250,8 +250,6 @@ if not st.session_state.logged_in:
                     ok, msg = register(username, password)
                     if ok: st.success(msg + "，请登录")
                     else: st.error(msg)
-        with c2:
-            st.caption("管理员: admin / admin123")
 
     st.stop()
 
