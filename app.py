@@ -98,8 +98,6 @@ div[role="radiogroup"] label:hover{background:#F3F4F6!important;}
 .tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;}
 
 /* ── Upload ── */
-.upload-area{border:2px dashed #D1D5DB;border-radius:var(--radius);padding:40px 20px;text-align:center;background:#fff;transition:all .15s;}
-.upload-area:hover{border-color:var(--blue);background:var(--blue-light);}
 </style>
 """,unsafe_allow_html=True)
 
@@ -429,24 +427,16 @@ elif st.session_state.page=="subject" and st.session_state.subject:
     # ═══ Upload ═══
     elif st.session_state.view=="upload":
         st.markdown('<h3 style="font-weight:700;">📤 上传学习资料</h3>',unsafe_allow_html=True)
-
-        # Simple upload area - no pipeline text
-        st.markdown(f"""
-        <div class="upload-area">
-            <div style="font-size:2.5rem;">📤</div>
-            <p style="font-weight:600;margin:8px 0;">点击下方按钮上传文件</p>
-            <p style="color:var(--muted);font-size:.85rem;">支持 PDF / Word / TXT 格式</p>
-        </div>""",unsafe_allow_html=True)
+        st.caption("支持 PDF / Word / TXT 格式，上传后自动识别科目章节并提取题目")
 
         um = st.file_uploader(
-            "选择文件上传",
+            "选择文件",
             type=["pdf","docx","doc","txt"],
-            accept_multiple_files=False,
-            label_visibility="visible",
+            accept_multiple_files=True,
             key="main_up"
         )
 
-        if um and isinstance(um, list):
+        if um:
             for f in um:
                 with st.spinner(f"处理 {f.name}..."):
                     result = process_upload(st.session_state.username, f)
