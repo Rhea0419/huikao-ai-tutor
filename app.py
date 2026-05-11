@@ -286,7 +286,6 @@ if st.session_state.page=="home":
 
     # Upload area on home page
     st.divider()
-    st.markdown("### 📤 上传学习资料")
     um = st.file_uploader(
         "",
         type=["pdf","docx","doc","txt"],
