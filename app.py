@@ -228,7 +228,7 @@ elif st.session_state.page == "subject" and st.session_state.subject:
                 p = kb_pct(s, ch); _, lb, _ = kb_level(p)
                 with cols[i % 3]:
                     q_count = len([q for q in sub_qs(s) if q["chapter"] == ch])
-                    if st.button(f"{lb}\n{ch}\n题库{q_count}题 ({p*100:.0f}%)",
+                    if st.button(f"{ch}  ({p*100:.0f}%)  [{q_count}题]",
                                  key=f"pch_{i}", use_container_width=True):
                         start_practice(ch)
                         st.rerun()
