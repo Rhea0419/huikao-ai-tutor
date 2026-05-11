@@ -10,7 +10,26 @@ from persistence import (save_state, load_state, load_kb_proficiency,
                           save_uploaded_file, list_user_uploads, list_extracted_questions)
 from doc_processor import process_upload
 
-st.set_page_config(page_title="会考AI学习管家", page_icon="🦉", layout="wide",
+# 名言库
+QUOTES = [
+    "学而不思则罔，思而不学则殆。 — 孔子",
+    "知识就是力量。 — 培根",
+    "学习是终身的事业。 — 钱伟长",
+    "不积跬步，无以至千里。 — 荀子",
+    "温故而知新，可以为师矣。 — 孔子",
+    "天才是百分之一的灵感加百分之九十九的汗水。 — 爱迪生",
+    "读书破万卷，下笔如有神。 — 杜甫",
+    "业精于勤，荒于嬉。 — 韩愈",
+    "学如逆水行舟，不进则退。 — 《增广贤文》",
+    "教育的根是苦的，但果实是甜的。 — 亚里士多德",
+    "学习不在于学校，而在于一生。 — 爱因斯坦",
+    "知之为知之，不知为不知，是知也。 — 孔子",
+    "少壮不努力，老大徒伤悲。 — 《长歌行》",
+    "博学之，审问之，慎思之，明辨之，笃行之。 — 《中庸》",
+    "吾生也有涯，而知也无涯。 — 庄子",
+]
+
+st.set_page_config(page_title="会考AI学习管家", page_icon="📚", layout="wide",
                    initial_sidebar_state="expanded")
 
 # ═══════════════════════════════════════
@@ -123,7 +142,7 @@ def maybe_save():
 def cfg():
     s = st.session_state.subject
     if s and s in SUBJECTS: return SUBJECTS[s]
-    return {"primary":"#2D2420","secondary":"#A69888","bg":"#FFFAF0","icon":"🦉","emoji":"📚","gradient":"#2D2420"}
+    return {"primary":"#2D2420","secondary":"#A69888","bg":"#FFFAF0","icon":"📚","emoji":"📚","gradient":"#2D2420"}
 
 def get_subj_colors(subj):
     return {"化学":("#7C3AED","#EDE9FE","#A78BFA"),"生物":("#059669","#ECFDF5","#6EE7B7"),
@@ -177,7 +196,7 @@ def get_level():
     return 1,"🌰 种子","#A69888"
 
 def get_mascot(pts):
-    if pts >= 1000: return "🦉"
+    if pts >= 1000: return "📚"
     if pts >= 500: return "🦊"
     if pts >= 200: return "🐱"
     if pts >= 50: return "🐤"
@@ -188,7 +207,8 @@ def get_mascot(pts):
 # ═══════════════════════════════════════
 if not st.session_state.logged_in:
     st.markdown('<div class="login-box pop">',unsafe_allow_html=True)
-    st.markdown('<div style="font-size:4rem;">🦉</div>',unsafe_allow_html=True)
+    quote = random.choice(QUOTES)
+    st.markdown(f'<div style="font-size:1.1rem;color:#A69888;font-style:italic;padding:12px 20px;background:#FFFAF0;border-radius:12px;border:1px solid #F0E4D4;margin-bottom:20px;">💬 {quote}</div>',unsafe_allow_html=True)
     st.markdown('<h1 style="font-weight:900;letter-spacing:-0.03em;">会考AI学习管家</h1>',unsafe_allow_html=True)
     st.markdown('<p style="color:#A69888;">北京高中学业水平合格性考试</p>',unsafe_allow_html=True)
 
@@ -317,7 +337,7 @@ with st.sidebar:
 # Home
 # ═══════════════════════════════════════
 if st.session_state.page=="home":
-    st.markdown(f'<h1 style="font-weight:900;font-size:2rem;letter-spacing:-0.03em;">🦉 你好，{st.session_state.username}！</h1>',unsafe_allow_html=True)
+    st.markdown(f'<h1 style="font-weight:900;font-size:2rem;letter-spacing:-0.03em;">你好，{st.session_state.username}！</h1>',unsafe_allow_html=True)
     st.markdown('<p style="color:#A69888;margin-bottom:24px;">选择科目开始今天的学习吧 ✨</p>',unsafe_allow_html=True)
 
     cols=st.columns(4)
@@ -553,4 +573,4 @@ elif st.session_state.page=="subject" and st.session_state.subject:
 
 # Auto-save on exit
 maybe_save()
-st.divider(); st.caption("🦉 会考AI学习管家 v6.0 · 多用户 · 数据持久化 · 文档智能入库")
+st.divider(); st.caption("会考AI学习管家 v6.0 · 多用户 · 数据持久化 · 文档智能入库")
