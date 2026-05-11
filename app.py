@@ -129,6 +129,8 @@ def init():
         "exam_start_time":None,"exam_end_time":None,
         "exam_questions":[],"exam_answers":{},"exam_submitted_set":set(),"exam_idx":0,
         "kb_proficiency":defaultdict(lambda:defaultdict(lambda:{"c":0,"t":0})),
+        "custom_mode":False,"custom_bank":None,"custom_idx":0,
+        "custom_answers":{},"custom_submitted":set(),
     }.items():
         if k not in st.session_state:st.session_state[k]=v
 init()
