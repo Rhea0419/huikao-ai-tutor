@@ -284,11 +284,31 @@ if st.session_state.page=="home":
                 st.session_state.page="subject";st.session_state.subject=subj
                 st.session_state.view="knowledge";add_pts(2);st.rerun()
 
+    # Upload area on home page
+    st.divider()
+    st.markdown("### 📤 上传学习资料")
+    um = st.file_uploader(
+        "",
+        type=["pdf","docx","doc","txt"],
+        accept_multiple_files=True,
+        label_visibility="collapsed",
+        key="home_up"
+    )
+    if um:
+        for f in um:
+            with st.spinner(f"处理 {f.name}..."):
+                result = process_upload(st.session_state.username, f)
+            if result.get("error"):
+                st.error(f"❌ {f.name}: {result['error']}")
+            else:
+                st.success(f"✅ {f.name} 处理完成 · 检测科目: {result.get('detected_subject') or '未识别'} · {result.get('questions_found',0)}题")
+                add_pts(10)
+
 # ═══════════════════════════ Subject ═══════════════════════════
 elif st.session_state.page=="subject" and st.session_state.subject:
     s=st.session_state.subject;sc,sbg=subj_color(s)
     st.markdown(f'<h1 style="font-weight:900;font-size:1.5rem;">{SUBJECTS[s]["icon"]} {s}</h1>',unsafe_allow_html=True)
-    views={"🧠 知识图谱":"knowledge","📝 练习":"practice","⏱️ 模拟考":"exam","📋 考纲":"syllabus","📤 上传":"upload"}
+    views={"🧠 知识图谱":"knowledge","📝 练习":"practice","⏱️ 模拟考":"exam","📋 考纲":"syllabus"}
     cur=[k for k,v in views.items() if v==st.session_state.view][0]
     c=st.radio("",list(views.keys()),horizontal=True,index=list(views.keys()).index(cur),label_visibility="collapsed")
     st.session_state.view=views[c];st.divider()
@@ -426,41 +446,5 @@ elif st.session_state.page=="subject" and st.session_state.subject:
             st.markdown(f"**{ki['icon']} {kn}** · {ki.get('desc','')}")
             tags=" ".join([f'<span class="tag" style="background:{sbg};color:{sc};">{sn}</span>' for sn in ki["subs"]])
             st.markdown(tags,unsafe_allow_html=True)
-
-    # ═══ Upload ═══
-    elif st.session_state.view=="upload":
-        st.markdown('<h3 style="font-weight:700;">📤 上传学习资料</h3>',unsafe_allow_html=True)
-
-        um = st.file_uploader(
-            "",
-            type=["pdf","docx","doc","txt"],
-            accept_multiple_files=True,
-            label_visibility="collapsed",
-            key="main_up"
-        )
-
-        if um:
-            for f in um:
-                with st.spinner(f"处理 {f.name}..."):
-                    result = process_upload(st.session_state.username, f)
-                if result.get("error"):
-                    st.error(f"❌ {f.name}: {result['error']}")
-                else:
-                    st.success(f"✅ {f.name} 处理完成")
-                    st.markdown(f"""
-                    <div class="card" style="font-size:.88rem;">
-                        <strong>检测科目：</strong>{result.get('detected_subject') or '未识别'}<br>
-                        <strong>匹配章节：</strong>{result.get('detected_chapter') or '未分类'}<br>
-                        <strong>发现题目：</strong>{result.get('questions_found',0)} 题<br>
-                        <strong>存储路径：</strong><code>{result.get('storage_path','')}</code>
-                    </div>""",unsafe_allow_html=True)
-                    add_pts(10)
-
-        uploads=list_user_uploads(st.session_state.username)
-        if uploads:
-            st.divider()
-            st.markdown("#### 📁 已上传")
-            for u in uploads:
-                st.markdown(f"📄 `{u['name']}` ({u['size']/1024:.1f}KB)")
 
 maybe_save()
