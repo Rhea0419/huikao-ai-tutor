@@ -8,6 +8,9 @@ from question_bank import ALL_QUESTIONS
 from auth import login, register, get_all_users
 from persistence import (save_state, load_state, load_kb_proficiency, list_user_uploads, list_extracted_questions)
 from doc_processor import process_upload
+from custom_bank import get_custom_banks, save_custom_bank, load_custom_bank
+from error_book import add_error, get_errors, mark_mastered
+from pdf_export import export_questions_pdf
 
 QUOTES = [
     "学而不思则罔，思而不学则殆。 — 孔子",
@@ -171,6 +174,7 @@ def start_practice(ch_name):
     s=st.session_state.subject
     qs=[q for q in sub_qs(s) if q["chapter"]==ch_name]
     if not qs:qs=[q for q in sub_qs(s) if ch_name in q["chapter"] or q["chapter"] in ch_name]
+    if not qs:qs=[q for q in sub_qs(s) if q["chapter"]=="其他"]
     random.shuffle(qs)
     st.session_state.practice_chapter=ch_name;st.session_state.practice_questions=qs
     st.session_state.practice_idx=0;st.session_state.practice_answers={}
@@ -309,14 +313,38 @@ if st.session_state.page=="home":
             if result.get("error"):
                 st.error(f"❌ {f.name}: {result['error']}")
             else:
-                st.success(f"✅ {f.name} 处理完成 · 检测科目: {result.get('detected_subject') or '未识别'} · {result.get('questions_found',0)}题")
+                subj_detected = result.get('detected_subject')
+                q_count = result.get('questions_found', 0)
+                st.success(f"✅ {f.name} 处理完成 · 检测科目: {subj_detected or '未识别'} · {q_count}题")
                 add_pts(10)
+
+                # Save to custom bank if questions found
+                if q_count > 0 and subj_detected:
+                    # Get parsed questions from the extracted file
+                    from persistence import DATA_DIR
+                    ext_file = DATA_DIR / "users" / st.session_state.username / "extracted" / f"{Path(f.name).stem}_questions.json"
+                    if ext_file.exists():
+                        import json as _json
+                        ext_data = _json.loads(ext_file.read_text())
+                        qs = ext_data.get("questions", [])
+                        if qs:
+                            # Add to ALL_QUESTIONS with "其他" chapter for unclassified
+                            for q in qs:
+                                if "chapter" not in q or q["chapter"] == "未分类":
+                                    q["chapter"] = "其他"
+                                if "id" not in q:
+                                    q["id"] = f"up_{hash(q.get('q',''))%100000:05d}"
+                                q["source"] = f.name
+                                if subj_detected in ALL_QUESTIONS:
+                                    ALL_QUESTIONS[subj_detected].append(q)
+                            save_custom_bank(st.session_state.username, subj_detected, f.name, qs)
+                            st.success(f"📦 已收入 {subj_detected} 自选题库！")
 
 # ═══════════════════════════ Subject ═══════════════════════════
 elif st.session_state.page=="subject" and st.session_state.subject:
     s=st.session_state.subject;sc,sbg=subj_color(s)
     st.markdown(f'<h1 style="font-weight:900;font-size:1.5rem;">{SUBJECTS[s]["icon"]} {s}</h1>',unsafe_allow_html=True)
-    views={"🧠 知识图谱":"knowledge","📝 练习":"practice","⏱️ 模拟考":"exam","📋 考纲":"syllabus"}
+    views={"🧠 知识图谱":"knowledge","📝 练习":"practice","⏱️ 模拟考":"exam","📦 自选题库":"custom","📕 错题本":"errors","📋 考纲":"syllabus"}
     cur=[k for k,v in views.items() if v==st.session_state.view][0]
     c=st.radio("",list(views.keys()),horizontal=True,index=list(views.keys()).index(cur),label_visibility="collapsed")
     st.session_state.view=views[c];st.divider()
@@ -371,6 +399,8 @@ elif st.session_state.page=="subject" and st.session_state.subject:
                         ok=(ch[0]==q["ans"]);upd_kb(q["chapter"],ok)
                         if ok:st.session_state.total_correct+=1;st.session_state.streak+=1;st.session_state.max_streak=max(st.session_state.max_streak,st.session_state.streak);add_pts(10)
                         else:st.session_state.total_wrong+=1;st.session_state.streak=0;add_pts(2)
+                        try:add_error(st.session_state.username,s,q,ch[0] if ch else'')
+                        except:pass
                         st.rerun()
             with c2:
                 if sub and idx+1<len(qs) and st.button("👉 下一题",key=f"pn_{qid}",use_container_width=True):
@@ -445,6 +475,101 @@ elif st.session_state.page=="subject" and st.session_state.subject:
                 if st.button("🔄 重考",use_container_width=True):st.session_state.exam_started=False;st.session_state.exam_submitted=False;st.rerun()
             with c2:
                 if st.button("🧠 图谱",use_container_width=True):st.session_state.exam_started=False;st.session_state.exam_submitted=False;st.session_state.view="knowledge";st.rerun()
+
+    # ═══ Custom Bank ═══
+    elif st.session_state.view=="custom":
+        st.markdown('<h3 style="font-weight:700;">📦 自选题库</h3>',unsafe_allow_html=True)
+        banks = get_custom_banks(st.session_state.username, s)
+        if not banks:
+            st.info("还没有自选题库。上传文件后自动出现在这里。")
+        else:
+            # Check if in question mode
+            if st.session_state.get("custom_mode") and st.session_state.get("custom_bank"):
+                bank = st.session_state.custom_bank
+                qs = bank.get("questions", [])
+                idx = st.session_state.get("custom_idx", 0)
+                st.markdown(f"**{bank.get('source','')}** · {idx+1}/{len(qs)}")
+                if st.button("← 返回列表", key="cb_back", use_container_width=True):
+                    st.session_state.custom_mode = False; st.rerun()
+                if idx < len(qs):
+                    q = qs[idx]; qid = f"cb_{idx}"
+                    sub = qid in st.session_state.get("custom_submitted", set())
+                    prev = st.session_state.get("custom_answers", {}).get(qid, "")
+                    st.markdown(f'<div class="qcard"><strong>{idx+1}.</strong> {q.get("q","")}</div>',unsafe_allow_html=True)
+                    opts = q.get("opts", [])
+                    if opts:
+                        ch = st.radio("", opts, index=opts.index(prev) if prev in opts else None, key=f"cbq_{idx}", disabled=sub)
+                    else:
+                        ch = st.text_input("你的答案", key=f"cbq_{idx}", disabled=sub)
+                    c1, c2 = st.columns(2)
+                    with c1:
+                        if not sub and st.button("✅ 提交", key=f"cbs_{idx}", use_container_width=True, type="primary"):
+                            st.session_state.custom_answers[qid] = ch
+                            st.session_state.custom_submitted.add(qid)
+                            ok = (ch and isinstance(ch,str) and q.get("ans","") and ch[0] == q["ans"][0])
+                            if ok: st.session_state.total_correct += 1; add_pts(10)
+                            else:
+                                st.session_state.total_wrong += 1; add_pts(2)
+                                try: add_error(st.session_state.username, s, q, ch[0] if ch and isinstance(ch,str) else '')
+                                except: pass
+                            st.rerun()
+                    with c2:
+                        if sub and idx+1 < len(qs):
+                            if st.button("👉 下一题", key=f"cbn_{idx}", use_container_width=True):
+                                st.session_state.custom_idx += 1; st.rerun()
+                    if sub:
+                        if isinstance(ch,str) and q.get("ans","") and ch and ch[0] == q["ans"][0]:
+                            st.markdown('<div class="fb-ok">🎉 正确！</div>',unsafe_allow_html=True)
+                        else:
+                            st.markdown(f'<div class="fb-no">答案: {q.get("ans","")}</div>',unsafe_allow_html=True)
+                        if q.get("exp"): st.info(q["exp"])
+                else:
+                    n = sum(1 for i in range(len(qs)) if st.session_state.get("custom_answers",{}).get(f"cb_{i}","") and qs[i].get("ans","") and st.session_state.custom_answers[f"cb_{i}"][0] == qs[i]["ans"][0])
+                    st.success(f"完成！{n}/{len(qs)}")
+                    try:
+                        pdf_bytes = export_questions_pdf(qs, bank.get("source","自选题库"))
+                        st.download_button("📥 导出PDF", pdf_bytes, f"{bank.get('source','题目')}.pdf", "application/pdf")
+                    except: pass
+                    if st.button("🔄 重做", use_container_width=True):
+                        st.session_state.custom_idx = 0; st.session_state.custom_answers = {}; st.session_state.custom_submitted = set(); st.rerun()
+            else:
+                for bank in banks:
+                    bn = bank["_file"]; src = bank.get("source","未知"); qc = bank.get("question_count",0)
+                    ct = bank.get("created_at","")
+                    if st.button(f"📄 {src} · {qc}题 · {ct}", key=f"cb_{bn}", use_container_width=True):
+                        st.session_state.custom_bank = bank; st.session_state.custom_idx = 0
+                        st.session_state.custom_answers = {}; st.session_state.custom_submitted = set()
+                        st.session_state.custom_mode = True; st.rerun()
+
+    # ═══ Error Book ═══
+    elif st.session_state.view=="errors":
+        st.markdown('<h3 style="font-weight:700;">📕 错题本</h3>',unsafe_allow_html=True)
+        errors = get_errors(st.session_state.username, s)
+        active = [e for e in errors if not e.get("mastered")]
+        mastered = [e for e in errors if e.get("mastered")]
+        st.markdown(f"❌ 未掌握 {len(active)} 题 | ✅ 已掌握 {len(mastered)} 题")
+        if not errors:
+            st.info("暂无错题，继续加油！")
+        else:
+            try:
+                pdf_bytes = export_questions_pdf([e["question"] for e in active], f"错题本-{s}")
+                st.download_button("📥 导出错题PDF", pdf_bytes, f"错题本_{s}.pdf", "application/pdf")
+            except: pass
+            st.divider()
+            t1, t2 = st.tabs(["❌ 未掌握", "✅ 已掌握"])
+            with t1:
+                for i, e in enumerate(active):
+                    q = e["question"]
+                    with st.expander(f"{i+1}. {q.get('q','')[:50]}... (错{e.get('attempts',1)}次)"):
+                        st.markdown(f"**题目**: {q.get('q','')}")
+                        for o in q.get('opts',[]): st.markdown(f"- {o}")
+                        st.markdown(f"你的: {e.get('user_answer','')} | 正确: {q.get('ans','')}")
+                        if q.get('exp'): st.info(q['exp'])
+                        if st.button("✅ 已掌握", key=f"em_{i}", use_container_width=True):
+                            mark_mastered(st.session_state.username, s, q.get('q','')); st.rerun()
+            with t2:
+                for i, e in enumerate(mastered):
+                    st.markdown(f"✅ {i+1}. {e['question'].get('q','')[:60]}...")
 
     # ═══ Syllabus ═══
     elif st.session_state.view=="syllabus":
