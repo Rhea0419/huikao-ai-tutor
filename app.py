@@ -427,10 +427,9 @@ elif st.session_state.page=="subject" and st.session_state.subject:
     # ═══ Upload ═══
     elif st.session_state.view=="upload":
         st.markdown('<h3 style="font-weight:700;">📤 上传学习资料</h3>',unsafe_allow_html=True)
-        st.caption("支持 PDF / Word / TXT 格式，上传后自动识别科目章节并提取题目")
 
         um = st.file_uploader(
-            "选择文件",
+            "支持 PDF、Word、TXT 格式，上传后自动识别科目章节并提取题目",
             type=["pdf","docx","doc","txt"],
             accept_multiple_files=True,
             key="main_up"
