@@ -206,43 +206,53 @@ def get_mascot(pts):
 # LOGIN PAGE
 # ═══════════════════════════════════════
 if not st.session_state.logged_in:
-    st.markdown('<div class="login-box pop">',unsafe_allow_html=True)
-    quote = random.choice(QUOTES)
-    st.markdown(f'<div style="font-size:1.1rem;color:#A69888;font-style:italic;padding:12px 20px;background:#FFFAF0;border-radius:12px;border:1px solid #F0E4D4;margin-bottom:20px;">💬 {quote}</div>',unsafe_allow_html=True)
-    st.markdown('<h1 style="font-weight:900;letter-spacing:-0.03em;">会考AI学习管家</h1>',unsafe_allow_html=True)
-    st.markdown('<p style="color:#A69888;">北京高中学业水平合格性考试</p>',unsafe_allow_html=True)
+    # Center column
+    _, center, _ = st.columns([1, 2, 1])
+    with center:
+        st.markdown("<br>", unsafe_allow_html=True)
+        quote = random.choice(QUOTES)
+        st.markdown(f"""
+        <div style="text-align:center;padding:32px 0 16px;">
+            <div style="font-size:1rem;color:#A69888;font-style:italic;padding:10px 18px;
+                        background:#FFFAF0;border-radius:12px;border:1px solid #F0E4D4;
+                        display:inline-block;max-width:480px;">
+                💬 {quote}
+            </div>
+            <h1 style="font-weight:900;font-size:2rem;letter-spacing:-0.03em;margin-top:24px;">会考AI学习管家</h1>
+            <p style="color:#A69888;font-size:1rem;">北京高中学业水平合格性考试</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-    mode = st.radio("", ["🔑 登录", "📝 注册"], horizontal=True, label_visibility="collapsed")
-    is_login = mode == "🔑 登录"
+        mode = st.radio("", ["🔑 登录", "📝 注册"], horizontal=True)
+        is_login = mode == "🔑 登录"
 
-    username = st.text_input("用户名", placeholder="输入用户名", key="login_user")
-    password = st.text_input("密码", type="password", placeholder="输入密码", key="login_pw")
+        username = st.text_input("用户名", placeholder="输入用户名", key="login_user")
+        password = st.text_input("密码", type="password", placeholder="输入密码", key="login_pw")
 
-    c1, c2 = st.columns(2)
-    with c1:
-        if st.button("登录" if is_login else "注册", type="primary", use_container_width=True):
-            if not username or not password:
-                st.error("请填写用户名和密码")
-            elif is_login:
-                ok, msg, is_adm = login(username, password)
-                if ok:
-                    st.session_state.logged_in = True; st.session_state.username = username
-                    st.session_state.is_admin = is_adm
-                    if not is_adm:
-                        state = load_state(username)
-                        for k, v in state.items():
-                            if k in st.session_state: st.session_state[k] = v
-                        st.session_state.kb_proficiency = load_kb_proficiency(username)
-                    st.rerun()
-                else: st.error(msg)
-            else:
-                ok, msg = register(username, password)
-                if ok: st.success(msg + "，请登录"); st.session_state.login_mode = "login"
-                else: st.error(msg)
-    with c2:
-        st.caption("管理员: admin / admin123")
+        c1, c2 = st.columns([2, 1])
+        with c1:
+            if st.button("登录" if is_login else "注册", type="primary", use_container_width=True):
+                if not username or not password:
+                    st.error("请填写用户名和密码")
+                elif is_login:
+                    ok, msg, is_adm = login(username, password)
+                    if ok:
+                        st.session_state.logged_in = True; st.session_state.username = username
+                        st.session_state.is_admin = is_adm
+                        if not is_adm:
+                            state = load_state(username)
+                            for k, v in state.items():
+                                if k in st.session_state: st.session_state[k] = v
+                            st.session_state.kb_proficiency = load_kb_proficiency(username)
+                        st.rerun()
+                    else: st.error(msg)
+                else:
+                    ok, msg = register(username, password)
+                    if ok: st.success(msg + "，请登录")
+                    else: st.error(msg)
+        with c2:
+            st.caption("管理员: admin / admin123")
 
-    st.markdown('</div>',unsafe_allow_html=True)
     st.stop()
 
 # ═══════════════════════════════════════
