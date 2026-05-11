@@ -96,8 +96,6 @@ div[role="radiogroup"] label:hover{background:#F3F4F6!important;}
 
 /* ── Tags ── */
 .tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;}
-
-/* ── Upload ── */
 </style>
 """,unsafe_allow_html=True)
 
@@ -427,11 +425,13 @@ elif st.session_state.page=="subject" and st.session_state.subject:
     # ═══ Upload ═══
     elif st.session_state.view=="upload":
         st.markdown('<h3 style="font-weight:700;">📤 上传学习资料</h3>',unsafe_allow_html=True)
+        st.markdown("支持 PDF、Word、TXT 格式 · 上传后自动识别科目章节")
 
         um = st.file_uploader(
-            "支持 PDF、Word、TXT 格式，上传后自动识别科目章节并提取题目",
+            "上传文件",
             type=["pdf","docx","doc","txt"],
             accept_multiple_files=True,
+            label_visibility="collapsed",
             key="main_up"
         )
 
@@ -460,4 +460,3 @@ elif st.session_state.page=="subject" and st.session_state.subject:
                 st.markdown(f"📄 `{u['name']}` ({u['size']/1024:.1f}KB)")
 
 maybe_save()
-st.divider();st.caption("会考AI学习管家")
