@@ -151,13 +151,18 @@ def subj_color(subj):
 
 def add_pts(n):st.session_state.points+=n;maybe_save()
 def kb_pct(s,k):
-    d=st.session_state.kb_proficiency[s][k];return d["c"]/max(1,d["t"])
+    d=st.session_state.kb_proficiency.get(s,{}).get(k,{"c":0,"t":0})
+    return d["c"]/max(1,d["t"])
 def kb_level(p):
     if p>=.8:return"mastered","熟练","#10B981"
     if p>=.5:return"ok","一般","#F59E0B"
     return"weak","薄弱","#EF4444"
 def upd_kb(ch,ok):
     s=st.session_state.subject
+    if s not in st.session_state.kb_proficiency:
+        st.session_state.kb_proficiency[s] = {}
+    if ch not in st.session_state.kb_proficiency[s]:
+        st.session_state.kb_proficiency[s][ch] = {"c":0,"t":0}
     st.session_state.kb_proficiency[s][ch]["t"]+=1
     if ok:st.session_state.kb_proficiency[s][ch]["c"]+=1
 def sub_qs(s):return ALL_QUESTIONS.get(s,[])
