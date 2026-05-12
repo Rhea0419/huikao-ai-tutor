@@ -78,23 +78,17 @@ section[data-testid="stSidebar"] { background: var(--canvas) !important; border-
 h1,h2,h3,h4 { color: var(--ink-deep); letter-spacing: -0.16px; }
 p,span,div,label,li { color: var(--ink); }
 
-/* ── Meta Pill Buttons (100px radius — NEVER squared) ── */
+/* ── Meta Pill Buttons ── */
 .stButton > button {
-    border-radius: var(--radius-pill) !important; font-weight: 700 !important;
+    border-radius: var(--radius-pill) !important; font-weight: 600 !important;
     font-size: 14px !important; padding: 10px 24px !important; letter-spacing: -0.14px !important;
     transition: all 0.15s ease !important; box-shadow: none !important;
-    border: 2px solid var(--ink-deep) !important; background: transparent !important; color: var(--ink-deep) !important;
+    border: 1.5px solid var(--hairline) !important; background: var(--canvas) !important; color: var(--ink) !important;
 }
-.stButton > button:hover { background: rgba(10,19,23,0.04) !important; }
-/* Primary = black pill (Meta marketing CTA) */
-.stButton > button[kind="primary"] { background: var(--ink-button) !important; color: var(--canvas) !important; border-color: var(--ink-button) !important; }
-.stButton > button[kind="primary"]:hover { background: var(--charcoal) !important; border-color: var(--charcoal) !important; }
-
-/* ── Cobalt button (buy-now / exam CTA) ── */
-.cobalt-btn button {
-    background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important;
-}
-.cobalt-btn button:hover { background: var(--primary-deep) !important; }
+.stButton > button:hover { background: var(--surface) !important; }
+/* Primary = cobalt blue */
+.stButton > button[kind="primary"] { background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important; }
+.stButton > button[kind="primary"]:hover { background: var(--primary-deep) !important; }
 
 /* ── Progress ── */
 .stProgress>div{background:var(--hairline-soft)!important;border-radius:4px!important;}
@@ -108,7 +102,7 @@ div[role="radiogroup"] label{
     border:1px solid var(--hairline)!important;background:var(--canvas)!important;color:var(--ink)!important;
 }
 div[role="radiogroup"] label:hover{background:var(--surface)!important;}
-div[role="radiogroup"] label[data-selected="true"]{background:var(--ink-deep)!important;color:var(--canvas)!important;border-color:var(--ink-deep)!important;}
+div[role="radiogroup"] label[data-selected="true"]{background:var(--primary)!important;color:#fff!important;border-color:var(--primary)!important;}
 
 /* ── Mastery bar ── */
 .mbar{height:4px;background:var(--hairline);border-radius:2px;overflow:hidden;margin:4px 0;}
