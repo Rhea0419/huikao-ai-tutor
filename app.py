@@ -33,41 +33,39 @@ st.set_page_config(page_title="会考AI学习管家", page_icon="📚", layout="
 # ═══════════════════════════ CSS ═══════════════════════════
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
 
 :root {
-    /* Notion-inspired design tokens */
-    --primary: #3B82F6;
-    --ink: #1a1a1a;
-    --charcoal: #37352f;
-    --slate: #5d5b54;
-    --steel: #787671;
-    --stone: #a4a097;
-    --muted: #9CA3AF;
+    /* Meta design tokens */
+    --primary: #0064e0;
+    --primary-deep: #0457cb;
+    --ink-button: #000000;
+    --ink-deep: #0a1317;
+    --ink: #1c1e21;
+    --charcoal: #444950;
+    --slate: #4b4c4f;
+    --steel: #5d6c7b;
+    --stone: #8595a4;
     --canvas: #ffffff;
-    --surface: #f6f5f4;
-    --hairline: #e5e3df;
-    --hairline-soft: #ede9e4;
-    --green: #10B981;
-    --orange: #F59E0B;
-    --red: #EF4444;
-    --tint-peach: #ffe8d4;
-    --tint-rose: #fde0ec;
-    --tint-mint: #d9f3e1;
-    --tint-lavender: #e6e0f5;
-    --tint-sky: #dcecfa;
-    --radius: 12px;
-    --radius-pill: 9999px;
-    --shadow: 0 1px 2px rgba(0,0,0,.04);
-    --shadow-card: 0 1px 3px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
+    --surface: #f1f4f7;
+    --hairline: #ced0d4;
+    --hairline-soft: #dee3e9;
+    --success: #31a24c;
+    --attention: #f2a918;
+    --critical: #e41e3f;
+    --radius-xl: 16px;
+    --radius-xxl: 24px;
+    --radius-xxxl: 32px;
+    --radius-pill: 100px;
+    --shadow-card: rgba(20,22,26,0.3) 0px 1px 4px 0px;
 }
 
-/* ── Hide Streamlit toolbar/header junk ── */
+/* ── Hide Streamlit toolbar ── */
 [data-testid="stToolbar"], header[data-testid="stHeader"],
 [data-testid="stDecoration"], #MainMenu, footer,
 .stDeployButton, [data-testid="stAppViewToolbar"] { display: none !important; }
 
-/* ── Clean file uploader: hide drag-drop text ── */
+/* ── Clean file uploader ── */
 [data-testid="stFileUploader"] section > div:first-child > span,
 [data-testid="stFileUploader"] small,
 [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] p { display: none !important; }
@@ -75,54 +73,72 @@ st.markdown("""
 
 /* ── Global ── */
 * { font-family: 'Noto Sans SC',system-ui,sans-serif !important; }
-.stApp { background: var(--surface) !important; }
-section[data-testid="stSidebar"] { background: var(--canvas) !important; border-right:1px solid var(--hairline) !important; }
-h1,h2,h3,h4,p,span,div,label,li { color: var(--ink); }
+.stApp { background: var(--canvas) !important; }
+section[data-testid="stSidebar"] { background: var(--canvas) !important; border-right:1px solid var(--hairline-soft) !important; }
+h1,h2,h3,h4 { color: var(--ink-deep); letter-spacing: -0.16px; }
+p,span,div,label,li { color: var(--ink); }
 
-/* ── Cards ── */
-.card {
-    background:var(--canvas);border-radius:var(--radius);padding:20px;
-    box-shadow:var(--shadow-card);
-}
-
-/* ── Pill Buttons ── */
+/* ── Meta Pill Buttons (100px radius — NEVER squared) ── */
 .stButton > button {
-    border-radius:8px !important;font-weight:500 !important;font-size:.875rem !important;
-    padding:8px 18px !important;transition:all .15s !important;
-    border:1px solid var(--hairline) !important;background:var(--canvas) !important;color:var(--ink) !important;
-    box-shadow: none !important;
+    border-radius: var(--radius-pill) !important; font-weight: 700 !important;
+    font-size: 14px !important; padding: 10px 24px !important; letter-spacing: -0.14px !important;
+    transition: all 0.15s ease !important; box-shadow: none !important;
+    border: 2px solid var(--ink-deep) !important; background: transparent !important; color: var(--ink-deep) !important;
 }
-.stButton > button:hover { background:var(--surface) !important;border-color:var(--hairline-soft) !important; }
-.stButton > button[kind="primary"] { background:var(--ink) !important;color:var(--canvas) !important;border-color:var(--ink) !important; }
-.stButton > button[kind="primary"]:hover { background:var(--charcoal) !important; }
+.stButton > button:hover { background: rgba(10,19,23,0.04) !important; }
+/* Primary = black pill (Meta marketing CTA) */
+.stButton > button[kind="primary"] { background: var(--ink-button) !important; color: var(--canvas) !important; border-color: var(--ink-button) !important; }
+.stButton > button[kind="primary"]:hover { background: var(--charcoal) !important; border-color: var(--charcoal) !important; }
+
+/* ── Cobalt button (buy-now / exam CTA) ── */
+.cobalt-btn button {
+    background: var(--primary) !important; color: #fff !important; border-color: var(--primary) !important;
+}
+.cobalt-btn button:hover { background: var(--primary-deep) !important; }
 
 /* ── Progress ── */
-.stProgress>div{background:var(--hairline)!important;border-radius:4px!important;}
-.stProgress>div>div{background:var(--primary)!important;border-radius:4px!important;}
+.stProgress>div{background:var(--hairline-soft)!important;border-radius:4px!important;}
+.stProgress>div>div{background:var(--ink-deep)!important;border-radius:4px!important;}
 
-/* ── Radio nav ── */
-div[role="radiogroup"]{gap:2px;display:flex;background:var(--surface);border-radius:10px;padding:3px;}
-div[role="radiogroup"] label{border-radius:8px!important;padding:7px 16px!important;font-weight:500!important;font-size:.85rem!important;border:none!important;}
+/* ── Pill Tab Navigation (Meta category pills) ── */
+div[role="radiogroup"]{gap:6px;display:flex;padding:0;}
+div[role="radiogroup"] label{
+    border-radius:var(--radius-pill)!important;padding:8px 16px!important;
+    font-weight:700!important;font-size:14px!important;letter-spacing:-0.14px!important;
+    border:1px solid var(--hairline)!important;background:var(--canvas)!important;color:var(--ink)!important;
+}
+div[role="radiogroup"] label:hover{background:var(--surface)!important;}
+div[role="radiogroup"] label[data-selected="true"]{background:var(--ink-deep)!important;color:var(--canvas)!important;border-color:var(--ink-deep)!important;}
 
 /* ── Mastery bar ── */
 .mbar{height:4px;background:var(--hairline);border-radius:2px;overflow:hidden;margin:4px 0;}
 .mfill{height:100%;border-radius:2px;transition:width .4s;}
 
-/* ── Question ── */
-.qcard{background:var(--canvas);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid var(--hairline);}
+/* ── Question Card (xxxl rounded) ── */
+.qcard{background:var(--canvas);border-radius:var(--radius-xxxl);padding:24px;border:1px solid var(--hairline-soft);}
 
 /* ── Feedback ── */
-.fb-ok{background:var(--tint-mint);border:1px solid #a7f3d0;border-radius:10px;padding:14px;}
-.fb-no{background:var(--tint-rose);border:1px solid #fecaca;border-radius:10px;padding:14px;}
+.fb-ok{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius-xl);padding:14px 18px;}
+.fb-no{background:#fef2f2;border:1px solid #fecaca;border-radius:var(--radius-xl);padding:14px 18px;}
 
-/* ── Sub knowledge ── */
-.subkb{background:var(--canvas);border:1px solid var(--hairline);border-radius:10px;padding:16px 20px;margin:8px 0;box-shadow:var(--shadow);}
-.lbl{color:var(--stone);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
+/* ── Sub knowledge (xl rounded) ── */
+.subkb{background:var(--canvas);border:1px solid var(--hairline-soft);border-radius:var(--radius-xl);padding:16px 22px;margin:8px 0;}
+.lbl{color:var(--stone);font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;}
 
-/* ── Tags ── */
-.tag{display:inline-block;padding:3px 10px;border-radius:8px;font-size:.75rem;font-weight:500;}
+/* ── Tags (pill badges) ── */
+.tag{display:inline-block;padding:4px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:700;}
+
+/* ── Cards ── */
+.card{background:var(--canvas);border-radius:var(--radius-xxxl);padding:24px;border:1px solid var(--hairline-soft);}
+
+/* ── Subject card (home) ── */
+.subject-card{
+    background:var(--canvas);border-radius:var(--radius-xxxl);padding:32px 20px;
+    text-align:center;border:1px solid var(--hairline-soft);transition:all .2s;
+}
+.subject-card:hover{box-shadow:var(--shadow-card);}
 </style>
-""",unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # ═══════════════════════════ Init ═══════════════════════════
 def init():
@@ -210,11 +226,11 @@ if not st.session_state.logged_in:
         quote=random.choice(QUOTES)
         st.markdown(f"""
         <div style="text-align:center;padding:32px 0 16px;">
-            <div style="font-size:.95rem;color:var(--muted);font-style:italic;padding:10px 18px;
-                        background:var(--tint-sky);border-radius:12px;border:1px solid #BFDBFE;
+            <div style="font-size:.95rem;color:var(--steel);font-style:italic;padding:10px 18px;
+                        background:var(--surface);border-radius:12px;border:1px solid #BFDBFE;
                         display:inline-block;max-width:480px;">💬 {quote}</div>
             <h1 style="font-weight:900;font-size:2rem;margin-top:24px;">会考AI学习管家</h1>
-            <p style="color:var(--muted);">北京高中学业水平合格性考试</p>
+            <p style="color:var(--steel);">北京高中学业水平合格性考试</p>
         </div>""",unsafe_allow_html=True)
         mode=st.radio("",["🔑 登录","📝 注册"],horizontal=True)
         is_login=mode=="🔑 登录"
@@ -278,8 +294,8 @@ with st.sidebar:
     st.markdown(f"""
     <div style="text-align:center;margin-bottom:12px;">
         <span style="font-weight:800;">👤 {st.session_state.username}</span><br>
-        <span style="font-size:.8rem;color:var(--muted);">{lv} {ln}</span>
-        <div style="font-size:1.8rem;font-weight:900;margin:8px 0;">{st.session_state.points}<span style="font-size:.85rem;color:var(--muted);">分</span></div>
+        <span style="font-size:.8rem;color:var(--steel);">{lv} {ln}</span>
+        <div style="font-size:1.8rem;font-weight:900;margin:8px 0;">{st.session_state.points}<span style="font-size:.85rem;color:var(--steel);">分</span></div>
     </div>""",unsafe_allow_html=True)
     if st.session_state.streak>=3:
         st.markdown(f'<div style="text-align:center;background:linear-gradient(135deg,#F97316,#FBBF24);color:#fff;border-radius:12px;padding:6px;font-weight:700;">🔥 {st.session_state.streak}连击</div>',unsafe_allow_html=True)
@@ -295,7 +311,7 @@ with st.sidebar:
 # ═══════════════════════════ Home ═══════════════════════════
 if st.session_state.page=="home":
     st.markdown(f'<h1 style="font-weight:900;font-size:1.6rem;">你好，{st.session_state.username} 👋</h1>',unsafe_allow_html=True)
-    st.markdown('<p style="color:var(--muted);margin-bottom:20px;">选择科目开始今天的学习</p>',unsafe_allow_html=True)
+    st.markdown('<p style="color:var(--steel);margin-bottom:20px;">选择科目开始今天的学习</p>',unsafe_allow_html=True)
     cols=st.columns(4)
     for i,(subj,cfg_)in enumerate(SUBJECTS.items()):
         m=sum(1 for k in cfg_["kb"] if kb_pct(subj,k)>=.8)
@@ -306,7 +322,7 @@ if st.session_state.page=="home":
             <div class="card" style="text-align:center;padding:24px 16px;border-top:3px solid {sc};">
                 <div style="font-size:2.5rem;">{cfg_['icon']}</div>
                 <h3 style="font-weight:700;font-size:1.1rem;margin:8px 0;">{subj}</h3>
-                <div style="color:var(--muted);font-size:.8rem;">{m}/{tk} 章节掌握 · {tq}题</div>
+                <div style="color:var(--steel);font-size:.8rem;">{m}/{tk} 章节掌握 · {tq}题</div>
             </div>""",unsafe_allow_html=True)
             if st.button(f"进入{subj}",key=f"go_{subj}",use_container_width=True,type="primary"):
                 st.session_state.page="subject";st.session_state.subject=subj
@@ -393,7 +409,7 @@ elif st.session_state.page=="subject" and st.session_state.subject:
             for i,ch in enumerate(chaps):
                 p=kb_pct(s,ch);qc=len([q for q in sub_qs(s) if q["chapter"]==ch])
                 with cols[i%3]:
-                    st.markdown(f'<div class="card" style="text-align:center;padding:14px;"><strong>{ch}</strong><br><span style="color:var(--muted);font-size:.82rem;">{qc}题 · {p*100:.0f}%</span></div>',unsafe_allow_html=True)
+                    st.markdown(f'<div class="card" style="text-align:center;padding:14px;"><strong>{ch}</strong><br><span style="color:var(--steel);font-size:.82rem;">{qc}题 · {p*100:.0f}%</span></div>',unsafe_allow_html=True)
                     if st.button("⚡ 开始",key=f"pch_{i}",use_container_width=True):start_practice(ch);st.rerun()
         qs=st.session_state.practice_questions;idx=st.session_state.practice_idx
         if qs and idx<len(qs):
@@ -430,7 +446,7 @@ elif st.session_state.page=="subject" and st.session_state.subject:
             pct_done=n/len(qs)*100;ch=st.session_state.practice_chapter;cp=kb_pct(s,ch)
             st.balloons()
             emoji="🎉" if pct_done>=80 else"💪" if pct_done>=60 else"🔥"
-            st.markdown(f'<div class="card" style="text-align:center;"><div style="font-size:2.5rem;">{emoji}</div><div style="font-size:2rem;font-weight:900;">{n}/{len(qs)}</div><div style="color:var(--muted);">正确率 {pct_done:.0f}%</div></div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="card" style="text-align:center;"><div style="font-size:2.5rem;">{emoji}</div><div style="font-size:2rem;font-weight:900;">{n}/{len(qs)}</div><div style="color:var(--steel);">正确率 {pct_done:.0f}%</div></div>',unsafe_allow_html=True)
             if cp>=.9 and f"m_{s}_{ch}" not in st.session_state:st.session_state[f"m_{s}_{ch}"]=True;add_pts(100);st.success(f"🏆 「{ch}」精通 +100分！")
             c1,c2,c3=st.columns(3)
             with c1:
@@ -445,7 +461,7 @@ elif st.session_state.page=="subject" and st.session_state.subject:
         st.markdown('<h3 style="font-weight:700;">⏱️ 模拟考试</h3>',unsafe_allow_html=True)
         aq=sub_qs(s);nq=min(20,len(aq))
         if not st.session_state.exam_started and not st.session_state.exam_submitted:
-            st.markdown(f'<div class="card" style="text-align:center;"><div style="font-size:3rem;">⏱️</div><h3>模拟考试 · {s}</h3><p style="color:var(--muted);">60分钟 · {nq}题 · 满分100 · 及格60</p></div>',unsafe_allow_html=True)
+            st.markdown(f'<div class="card" style="text-align:center;"><div style="font-size:3rem;">⏱️</div><h3>模拟考试 · {s}</h3><p style="color:var(--steel);">60分钟 · {nq}题 · 满分100 · 及格60</p></div>',unsafe_allow_html=True)
             if st.button("🚀 开始考试",type="primary",use_container_width=True):
                 eq=random.sample(aq,min(nq,len(aq)));random.shuffle(eq)
                 st.session_state.exam_questions=eq;st.session_state.exam_answers={};st.session_state.exam_submitted_set=set()
