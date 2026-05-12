@@ -36,19 +36,30 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 
 :root {
-    --blue: #3B82F6;
-    --blue-light: #EFF6FF;
+    /* Notion-inspired design tokens */
+    --primary: #3B82F6;
+    --ink: #1a1a1a;
+    --charcoal: #37352f;
+    --slate: #5d5b54;
+    --steel: #787671;
+    --stone: #a4a097;
+    --muted: #9CA3AF;
+    --canvas: #ffffff;
+    --surface: #f6f5f4;
+    --hairline: #e5e3df;
+    --hairline-soft: #ede9e4;
     --green: #10B981;
     --orange: #F59E0B;
     --red: #EF4444;
-    --bg: #F3F4F6;
-    --card: #FFFFFF;
-    --text: #111827;
-    --muted: #9CA3AF;
-    --border: #E5E7EB;
-    --radius: 16px;
-    --shadow: 0 1px 3px rgba(0,0,0,.06);
-    --shadow-card: 0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
+    --tint-peach: #ffe8d4;
+    --tint-rose: #fde0ec;
+    --tint-mint: #d9f3e1;
+    --tint-lavender: #e6e0f5;
+    --tint-sky: #dcecfa;
+    --radius: 12px;
+    --radius-pill: 9999px;
+    --shadow: 0 1px 2px rgba(0,0,0,.04);
+    --shadow-card: 0 1px 3px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.03);
 }
 
 /* ── Hide Streamlit toolbar/header junk ── */
@@ -61,58 +72,55 @@ st.markdown("""
 [data-testid="stFileUploader"] small,
 [data-testid="stFileUploader"] [data-testid="stMarkdownContainer"] p { display: none !important; }
 [data-testid="stFileUploader"] button { margin-top: 0 !important; }
-[data-testid="stToolbar"], header[data-testid="stHeader"],
-[data-testid="stDecoration"], #MainMenu, footer,
-.stDeployButton, [data-testid="stAppViewToolbar"] { display: none !important; }
 
 /* ── Global ── */
 * { font-family: 'Noto Sans SC',system-ui,sans-serif !important; }
-.stApp { background: var(--bg) !important; }
-section[data-testid="stSidebar"] { background: #fff !important; border-right:1px solid var(--border) !important; }
-h1,h2,h3,h4,p,span,div,label,li { color: var(--text); }
+.stApp { background: var(--surface) !important; }
+section[data-testid="stSidebar"] { background: var(--canvas) !important; border-right:1px solid var(--hairline) !important; }
+h1,h2,h3,h4,p,span,div,label,li { color: var(--ink); }
 
 /* ── Cards ── */
 .card {
-    background:#fff;border-radius:var(--radius);padding:20px;
-    box-shadow:var(--shadow-card);border:1px solid var(--border);
+    background:var(--canvas);border-radius:var(--radius);padding:20px;
+    box-shadow:var(--shadow-card);
 }
 
-/* ── Buttons ── */
+/* ── Pill Buttons ── */
 .stButton > button {
-    border-radius:12px !important;font-weight:600 !important;font-size:.9rem !important;
-    padding:10px 20px !important;transition:all .15s !important;
-    border:1px solid var(--border) !important;background:#fff !important;color:var(--text) !important;
+    border-radius:8px !important;font-weight:500 !important;font-size:.875rem !important;
+    padding:8px 18px !important;transition:all .15s !important;
+    border:1px solid var(--hairline) !important;background:var(--canvas) !important;color:var(--ink) !important;
+    box-shadow: none !important;
 }
-.stButton > button:hover { background:#F9FAFB !important;border-color:#D1D5DB !important; }
-.stButton > button[kind="primary"] { background:var(--blue) !important;color:#fff !important;border-color:var(--blue) !important; }
-.stButton > button[kind="primary"]:hover { background:#2563EB !important; }
+.stButton > button:hover { background:var(--surface) !important;border-color:var(--hairline-soft) !important; }
+.stButton > button[kind="primary"] { background:var(--ink) !important;color:var(--canvas) !important;border-color:var(--ink) !important; }
+.stButton > button[kind="primary"]:hover { background:var(--charcoal) !important; }
 
 /* ── Progress ── */
-.stProgress>div{background:#E5E7EB!important;border-radius:6px!important;}
-.stProgress>div>div{background:var(--blue)!important;border-radius:6px!important;}
+.stProgress>div{background:var(--hairline)!important;border-radius:4px!important;}
+.stProgress>div>div{background:var(--primary)!important;border-radius:4px!important;}
 
 /* ── Radio nav ── */
-div[role="radiogroup"]{gap:4px;display:flex;}
-div[role="radiogroup"] label{border-radius:10px!important;padding:8px 18px!important;font-weight:600!important;font-size:.88rem!important;}
-div[role="radiogroup"] label:hover{background:#F3F4F6!important;}
+div[role="radiogroup"]{gap:2px;display:flex;background:var(--surface);border-radius:10px;padding:3px;}
+div[role="radiogroup"] label{border-radius:8px!important;padding:7px 16px!important;font-weight:500!important;font-size:.85rem!important;border:none!important;}
 
 /* ── Mastery bar ── */
-.mbar{height:6px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin:4px 0;}
-.mfill{height:100%;border-radius:3px;transition:width .4s;}
+.mbar{height:4px;background:var(--hairline);border-radius:2px;overflow:hidden;margin:4px 0;}
+.mfill{height:100%;border-radius:2px;transition:width .4s;}
 
 /* ── Question ── */
-.qcard{background:#fff;border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.qcard{background:var(--canvas);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid var(--hairline);}
 
 /* ── Feedback ── */
-.fb-ok{background:#ECFDF5;border:1px solid #A7F3D0;border-radius:12px;padding:14px;}
-.fb-no{background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:14px;}
+.fb-ok{background:var(--tint-mint);border:1px solid #a7f3d0;border-radius:10px;padding:14px;}
+.fb-no{background:var(--tint-rose);border:1px solid #fecaca;border-radius:10px;padding:14px;}
 
 /* ── Sub knowledge ── */
-.subkb{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin:8px 0;box-shadow:var(--shadow);}
-.lbl{color:var(--muted);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;}
+.subkb{background:var(--canvas);border:1px solid var(--hairline);border-radius:10px;padding:16px 20px;margin:8px 0;box-shadow:var(--shadow);}
+.lbl{color:var(--stone);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
 
 /* ── Tags ── */
-.tag{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.75rem;font-weight:600;}
+.tag{display:inline-block;padding:3px 10px;border-radius:8px;font-size:.75rem;font-weight:500;}
 </style>
 """,unsafe_allow_html=True)
 
@@ -203,7 +211,7 @@ if not st.session_state.logged_in:
         st.markdown(f"""
         <div style="text-align:center;padding:32px 0 16px;">
             <div style="font-size:.95rem;color:var(--muted);font-style:italic;padding:10px 18px;
-                        background:var(--blue-light);border-radius:12px;border:1px solid #DBEAFE;
+                        background:var(--tint-sky);border-radius:12px;border:1px solid #BFDBFE;
                         display:inline-block;max-width:480px;">💬 {quote}</div>
             <h1 style="font-weight:900;font-size:2rem;margin-top:24px;">会考AI学习管家</h1>
             <p style="color:var(--muted);">北京高中学业水平合格性考试</p>
